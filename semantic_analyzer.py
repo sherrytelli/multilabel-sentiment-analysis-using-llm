@@ -70,4 +70,11 @@ class Semantic_Analyzer:
         labels = response_json.get("labels", [])
         confidences = response_json.get("confidence", [])
 
-        return (labels, confidences)
+        # ensuring that labels part of VALID_CATEGORIES are returned
+        val_labels, val_confidences = [], []
+        for label, confidence in zip(labels, confidences):
+            if label in self.VALID_CATEGORIES:
+                val_labels.append(label)
+                val_confidences.append(int(confidence))
+
+        return (val_labels, val_confidences)
