@@ -14,6 +14,7 @@ if __name__ == "__main__":
 
         labels, confidences = analyzer.analyze(prompt)
 
+        print()
         for label, confidence in zip(labels, confidences):
-            print(f"\nBot: label: {label}, confidence: {confidence}")
+            print(f"Bot: label: {label}, confidence: {confidence}%")
         print()
