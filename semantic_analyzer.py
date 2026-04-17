@@ -19,6 +19,8 @@ class Semantic_Analyzer:
         5. PREFER SINGLE-LABEL OUTPUTS. Only return multiple labels if the text clearly and substantially addresses MULTIPLE categories simultaneously. NEVER force additional labels if one category dominates.
         6. NO markdown, NO code fences, NO explanations. Return RAW JSON only.
         7. If the text does not strongly align with any category, assign low confidence (10–25%) to the most plausible one and keep the array minimal. Prioritize accuracy over quantity.
+
+        IMPORTANT: JUST RETURN JSON, DO NOT return anything else. DO NOT try to solve other example sentences
         """
 
         self.VALID_CATEGORIES = [
@@ -44,11 +46,25 @@ class Semantic_Analyzer:
         ).message.content
 
         # extracting json from response
-        if response.startswith("```json"):
-            response = response.replace("```json", "").replace("```", "").strip()
+        start_index = response.find("{")
+        stack_counter = 0
+        end_index = -1
+        for i in range(start_index, len(response)):  # Iterate starting from the first {
+            char = response[i]
+
+            if char == "{":
+                stack_counter += 1
+            elif char == "}":
+                stack_counter -= 1
+
+                # If stack returns to zero, we found the closing brace
+                if stack_counter == 0:
+                    end_index = i + 1
+                    break
+        json_str = response[start_index:end_index].strip()
 
         # converting json response to python dictionary
-        response_json = json.loads(response)
+        response_json = json.loads(json_str)
 
         # extracting labels and confidences
         labels = response_json.get("labels", [])
